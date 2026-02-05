@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.data
 
+import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
+import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.data.source.local.FakeTaskDao
 import com.example.android.architecture.blueprints.todoapp.data.source.network.FakeNetworkDataSource
 import com.google.common.truth.Truth.assertThat
@@ -65,7 +67,8 @@ class DefaultTaskRepositoryTest {
             networkDataSource = networkDataSource,
             localDataSource = localDataSource,
             dispatcher = testDispatcher,
-            scope = testScope
+            scope = testScope,
+            appMessageQueue =FakeAppMessageQueue()
         )
     }
 
@@ -274,6 +277,7 @@ class DefaultTaskRepositoryTest {
 
         // Delete first task
         taskRepository.deleteTask(task1.id)
+        taskRepository.addPendingMessage(DELETE_RESULT_OK)
 
         // Fetch data again
         val afterDeleteTasks = taskRepository.getTasks(true)

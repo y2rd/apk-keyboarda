@@ -108,6 +108,10 @@ class TaskDetailViewModel @Inject constructor(
         }
     }
 
+    fun setPendingMessage(message: Int){
+        taskRepository.addPendingMessage(message = message)
+    }
+
     fun refresh() {
         _isLoading.value = true
         viewModelScope.launch {

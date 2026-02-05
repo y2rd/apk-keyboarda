@@ -24,6 +24,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 import com.example.android.architecture.blueprints.todoapp.data.source.local.ToDoDatabase
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.network.TaskNetworkDataSource
+import com.example.android.architecture.blueprints.todoapp.util.AppMessageQueue
+import com.example.android.architecture.blueprints.todoapp.util.AppMessageQueueImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -66,4 +68,10 @@ object DatabaseModule {
 
     @Provides
     fun provideTaskDao(database: ToDoDatabase): TaskDao = database.taskDao()
+
+    @Provides
+    fun provideAppMessageQueue(@ApplicationContext context: Context): AppMessageQueue {
+        return AppMessageQueueImpl(context
+            .getSharedPreferences("message_queue", Context.MODE_PRIVATE))
+    }
 }

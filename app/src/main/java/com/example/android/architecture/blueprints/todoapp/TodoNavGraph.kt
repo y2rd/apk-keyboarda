@@ -62,20 +62,15 @@ fun TodoNavGraph(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        composable(
-            TodoDestinations.TASKS_ROUTE,
-            arguments = listOf(
-                navArgument(USER_MESSAGE_ARG) { type = NavType.IntType; defaultValue = 0 }
-            )
-        ) { entry ->
+        composable(TodoDestinations.TASKS_ROUTE,) { entry ->
             AppModalDrawer(drawerState, currentRoute, navActions) {
                 TasksScreen(
-                    userMessage = entry.arguments?.getInt(USER_MESSAGE_ARG)!!,
                     onUserMessageDisplayed = { entry.arguments?.putInt(USER_MESSAGE_ARG, 0) },
                     onAddTask = { navActions.navigateToAddEditTask(R.string.add_task, null) },
                     onTaskClick = { task -> navActions.navigateToTaskDetail(task.id) },
                     openDrawer = { coroutineScope.launch { drawerState.open() } }
                 )
+
             }
         }
         composable(TodoDestinations.STATISTICS_ROUTE) {
@@ -93,10 +88,9 @@ fun TodoNavGraph(
             val taskId = entry.arguments?.getString(TASK_ID_ARG)
             AddEditTaskScreen(
                 topBarTitle = entry.arguments?.getInt(TITLE_ARG)!!,
+                taskId = taskId,
                 onTaskUpdate = {
-                    navActions.navigateToTasks(
-                        if (taskId == null) ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
-                    )
+                    navActions.navigateToTasksV2()
                 },
                 onBack = { navController.popBackStack() }
             )
@@ -107,7 +101,7 @@ fun TodoNavGraph(
                     navActions.navigateToAddEditTask(R.string.edit_task, taskId)
                 },
                 onBack = { navController.popBackStack() },
-                onDeleteTask = { navActions.navigateToTasks(DELETE_RESULT_OK) }
+                onDeleteTask = { navActions.navigateToTasks() }
             )
         }
     }
@@ -117,3 +111,4 @@ fun TodoNavGraph(
 const val ADD_EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 1
 const val DELETE_RESULT_OK = Activity.RESULT_FIRST_USER + 2
 const val EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 3
+const val NO_MESSAGE =  Activity.RESULT_FIRST_USER - 1

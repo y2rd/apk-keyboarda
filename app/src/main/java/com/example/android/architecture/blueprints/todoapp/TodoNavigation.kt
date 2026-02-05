@@ -16,6 +16,7 @@
 
 package com.example.android.architecture.blueprints.todoapp
 
+import androidx.compose.ui.window.Popup
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.TASK_ID_ARG
@@ -76,7 +77,36 @@ class TodoNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    fun navigateToStatistics() {
+    fun navigateToTasks() {
+        navController.navigate(
+            TASKS_SCREEN
+        ) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                inclusive = true
+                saveState = false
+            }
+            launchSingleTop = true
+            restoreState = false
+        }
+    }
+
+    fun navigateToTasksV2() {
+        navController.navigate(
+            TASKS_SCREEN
+        ){
+            popUpTo(navController.graph.findStartDestination().id) {
+                inclusive = true
+                saveState = false
+            }
+            launchSingleTop = true
+            restoreState = false
+        }
+    }
+
+
+
+
+        fun navigateToStatistics() {
         navController.navigate(TodoDestinations.STATISTICS_ROUTE) {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations

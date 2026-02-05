@@ -35,6 +35,7 @@ class FakeTaskRepository : TaskRepository {
 
     private val _savedTasks = MutableStateFlow(LinkedHashMap<String, Task>())
     val savedTasks: StateFlow<LinkedHashMap<String, Task>> = _savedTasks.asStateFlow()
+    private val msgQueue = FakeAppMessageQueue()
 
     private val observableTasks: Flow<List<Task>> = savedTasks.map {
         if (shouldThrowError) {
@@ -130,6 +131,12 @@ class FakeTaskRepository : TaskRepository {
             newTasks
         }
     }
+
+    override fun addPendingMessage(message: Int) {
+        msgQueue.setHasPendingMessage(message)
+    }
+
+    override fun readOncePendingMessage(): Int = msgQueue.getPendingMessageOnce()
 
     override suspend fun deleteAllTasks() {
         _savedTasks.update {

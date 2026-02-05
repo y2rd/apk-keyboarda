@@ -77,6 +77,7 @@ class AddEditTaskScreenTest {
                         topBarTitle = R.string.add_task,
                         onTaskUpdate = { },
                         onBack = { },
+                        taskId = null
                     )
                 }
             }

@@ -20,6 +20,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.Tas
 import com.example.android.architecture.blueprints.todoapp.data.source.network.NetworkDataSource
 import com.example.android.architecture.blueprints.todoapp.di.ApplicationScope
 import com.example.android.architecture.blueprints.todoapp.di.DefaultDispatcher
+import com.example.android.architecture.blueprints.todoapp.util.AppMessageQueue
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -44,8 +45,9 @@ import javax.inject.Singleton
 class DefaultTaskRepository @Inject constructor(
     private val networkDataSource: NetworkDataSource,
     private val localDataSource: TaskDao,
+    private val appMessageQueue: AppMessageQueue,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
-    @ApplicationScope private val scope: CoroutineScope,
+    @ApplicationScope private val scope: CoroutineScope
 ) : TaskRepository {
 
     override suspend fun createTask(title: String, description: String): String {
@@ -63,6 +65,7 @@ class DefaultTaskRepository @Inject constructor(
         saveTasksToNetwork()
         return taskId
     }
+
 
     override suspend fun updateTask(taskId: String, title: String, description: String) {
         val task = getTask(taskId)?.copy(
@@ -135,6 +138,14 @@ class DefaultTaskRepository @Inject constructor(
     override suspend fun deleteTask(taskId: String) {
         localDataSource.deleteById(taskId)
         saveTasksToNetwork()
+    }
+
+    override fun addPendingMessage(message: Int) {
+        appMessageQueue.setHasPendingMessage(message = message)
+    }
+
+    override fun readOncePendingMessage(): Int {
+        return appMessageQueue.getPendingMessageOnce()
     }
 
     /**

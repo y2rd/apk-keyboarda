@@ -54,12 +54,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.android.architecture.blueprints.todoapp.ADD_EDIT_RESULT_OK
+import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.util.AddEditTaskTopAppBar
 
 @Composable
 fun AddEditTaskScreen(
     @StringRes topBarTitle: Int,
+    taskId: String?,
     onTaskUpdate: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -90,8 +93,12 @@ fun AddEditTaskScreen(
         // Check if the task is saved and call onTaskUpdate event
         LaunchedEffect(uiState.isTaskSaved) {
             if (uiState.isTaskSaved) {
+                viewModel.setPendingMessage(if (taskId != null)
+                    ADD_EDIT_RESULT_OK else EDIT_RESULT_OK)
                 onTaskUpdate()
             }
+
+
         }
 
         // Check for user messages to display on the screen

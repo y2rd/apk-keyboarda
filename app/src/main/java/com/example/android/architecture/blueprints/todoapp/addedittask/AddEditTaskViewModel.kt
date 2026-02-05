@@ -48,7 +48,7 @@ data class AddEditTaskUiState(
 @HiltViewModel
 class AddEditTaskViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
-    savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val taskId: String? = savedStateHandle[TodoDestinationsArgs.TASK_ID_ARG]
@@ -77,7 +77,7 @@ class AddEditTaskViewModel @Inject constructor(
         if (taskId == null) {
             createNewTask()
         } else {
-            updateTask()
+             updateTask()
         }
     }
 
@@ -104,6 +104,10 @@ class AddEditTaskViewModel @Inject constructor(
         _uiState.update {
             it.copy(isTaskSaved = true)
         }
+    }
+
+    fun setPendingMessage(message: Int){
+        taskRepository.addPendingMessage(message)
     }
 
     private fun updateTask() {

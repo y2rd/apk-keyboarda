@@ -80,6 +80,8 @@ class TasksScreenTest {
         composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
     }
 
+
+
     @Test
     fun displayActiveTask() = runTest {
         repository.createTask("TITLE1", "DESCRIPTION1")
@@ -259,7 +261,6 @@ class TasksScreenTest {
                 Surface {
                     TasksScreen(
                         viewModel = TasksViewModel(repository, SavedStateHandle()),
-                        userMessage = R.string.successfully_added_task_message,
                         onUserMessageDisplayed = { },
                         onAddTask = { },
                         onTaskClick = { },

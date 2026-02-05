@@ -48,4 +48,9 @@ interface TaskRepository {
     suspend fun deleteAllTasks()
 
     suspend fun deleteTask(taskId: String)
+
+    fun addPendingMessage(message: Int)
+
+    fun readOncePendingMessage(): Int
+
 }

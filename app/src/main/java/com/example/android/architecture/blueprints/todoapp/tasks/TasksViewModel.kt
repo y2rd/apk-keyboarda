@@ -16,13 +16,16 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.architecture.blueprints.todoapp.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
+import com.example.android.architecture.blueprints.todoapp.NO_MESSAGE
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
@@ -31,6 +34,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType
 import com.example.android.architecture.blueprints.todoapp.util.Async
 import com.example.android.architecture.blueprints.todoapp.util.WhileUiSubscribed
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -59,6 +63,7 @@ class TasksViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
 
     private val _savedFilterType =
         savedStateHandle.getStateFlow(TASKS_FILTER_SAVED_STATE_KEY, ALL_TASKS)
@@ -121,11 +126,12 @@ class TasksViewModel @Inject constructor(
         }
     }
 
-    fun showEditResultMessage(result: Int) {
-        when (result) {
+    fun showEditResultMessage() {
+        when (taskRepository.readOncePendingMessage()) {
             EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_task_message)
             ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_task_message)
             DELETE_RESULT_OK -> showSnackbarMessage(R.string.successfully_deleted_task_message)
+            NO_MESSAGE -> snackbarMessageShown()
         }
     }
 

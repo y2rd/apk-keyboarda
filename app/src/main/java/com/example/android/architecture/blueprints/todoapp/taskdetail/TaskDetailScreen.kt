@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.util.LoadingContent
@@ -92,6 +93,7 @@ fun TaskDetailScreen(
         // Check if the task is deleted and call onDeleteTask
         LaunchedEffect(uiState.isTaskDeleted) {
             if (uiState.isTaskDeleted) {
+                viewModel.setPendingMessage(DELETE_RESULT_OK)
                 onDeleteTask()
             }
         }
