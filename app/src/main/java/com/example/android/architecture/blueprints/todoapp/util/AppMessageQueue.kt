@@ -22,7 +22,7 @@ class AppMessageQueueImpl(private val prefs: SharedPreferences) : AppMessageQueu
 
     override fun consume(): Int {
         val pendingMsg = prefs.getInt(MESSAGE_KEY, 0)
-        prefs.edit(commit = false) {
+        prefs.edit {
             remove(MESSAGE_KEY)
         }
         return pendingMsg

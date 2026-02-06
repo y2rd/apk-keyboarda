@@ -62,10 +62,9 @@ fun TodoNavGraph(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        composable(TodoDestinations.TASKS_ROUTE,) { entry ->
+        composable(TodoDestinations.TASKS_ROUTE) { entry ->
             AppModalDrawer(drawerState, currentRoute, navActions) {
                 TasksScreen(
-                    onUserMessageDisplayed = { entry.arguments?.putInt(USER_MESSAGE_ARG, 0) },
                     onAddTask = { navActions.navigateToAddEditTask(R.string.add_task, null) },
                     onTaskClick = { task -> navActions.navigateToTaskDetail(task.id) },
                     openDrawer = { coroutineScope.launch { drawerState.open() } }
@@ -111,4 +110,4 @@ fun TodoNavGraph(
 const val ADD_EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 1
 const val DELETE_RESULT_OK = Activity.RESULT_FIRST_USER + 2
 const val EDIT_RESULT_OK = Activity.RESULT_FIRST_USER + 3
-const val NO_MESSAGE =  Activity.RESULT_FIRST_USER - 1
+const val NO_MESSAGE = Activity.RESULT_FIRST_USER - 1

@@ -69,7 +69,6 @@ import com.example.android.architecture.blueprints.todoapp.util.TasksTopAppBar
 fun TasksScreen(
     onAddTask: () -> Unit,
     onTaskClick: (Task) -> Unit,
-    onUserMessageDisplayed: () -> Unit,
     openDrawer: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TasksViewModel = hiltViewModel(),
@@ -113,15 +112,13 @@ fun TasksScreen(
             val snackbarText = stringResource(message)
             LaunchedEffect(snackbarHostState, viewModel, message, snackbarText) {
                 snackbarHostState.showSnackbar(snackbarText)
-                viewModel.snackbarMessageShown()
+              //  viewModel.snackbarMessageShown()
             }
         }
 
         // Check if there's a userMessage to show to the user
-        val currentOnUserMessageDisplayed by rememberUpdatedState(onUserMessageDisplayed)
         LaunchedEffect(Unit) {
             viewModel.showEditResultMessage()
-            currentOnUserMessageDisplayed()
         }
     }
 }
