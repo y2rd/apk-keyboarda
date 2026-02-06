@@ -68,7 +68,7 @@ fun AppModalDrawer(
 
             AppDrawer(
                 currentRoute = currentRoute,
-                navigateToTasks = { navigationActions.navigateToTasks() },
+                navigateToTasks = { navigationActions.navigateToTasks(0) },
                 navigateToStatistics = { navigationActions.navigateToStatistics() },
                 closeDrawer = { coroutineScope.launch { drawerState.close() } }
             )

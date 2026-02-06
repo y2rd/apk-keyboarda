@@ -60,7 +60,7 @@ object TodoDestinations {
  */
 class TodoNavigationActions(private val navController: NavHostController) {
 
-    fun navigateToTasks(userMessage: Int =0) {
+    fun navigateToTasks(userMessage: Int) {
 
         val navigatesFromDrawer = userMessage == 0
 
