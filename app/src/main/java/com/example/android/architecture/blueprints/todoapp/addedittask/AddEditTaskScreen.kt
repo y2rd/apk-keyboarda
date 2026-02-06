@@ -64,7 +64,7 @@ import com.example.android.architecture.blueprints.todoapp.util.AddEditTaskTopAp
 fun AddEditTaskScreen(
     @StringRes topBarTitle: Int,
     taskId: String?,
-    onTaskUpdate: () -> Unit,
+    onTaskUpdate: (Int) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AddEditTaskViewModel = hiltViewModel(),
@@ -95,9 +95,10 @@ fun AddEditTaskScreen(
         // Check if the task is saved and call onTaskUpdate event
         LaunchedEffect(uiState.isTaskSaved) {
             if (uiState.isTaskSaved) {
-                viewModel.setPendingMessage(if (taskId == null)
-                    ADD_EDIT_RESULT_OK else EDIT_RESULT_OK)
-                onTaskUpdate()
+                val taskId = if (taskId == null)
+                    ADD_EDIT_RESULT_OK else EDIT_RESULT_OK
+                viewModel.setPendingMessage(taskId)
+                onTaskUpdate(taskId)
             }
 
 

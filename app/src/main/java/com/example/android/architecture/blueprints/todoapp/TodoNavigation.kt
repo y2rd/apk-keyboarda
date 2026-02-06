@@ -26,6 +26,8 @@ import com.example.android.architecture.blueprints.todoapp.TodoScreens.ADD_EDIT_
 import com.example.android.architecture.blueprints.todoapp.TodoScreens.STATISTICS_SCREEN
 import com.example.android.architecture.blueprints.todoapp.TodoScreens.TASKS_SCREEN
 import com.example.android.architecture.blueprints.todoapp.TodoScreens.TASK_DETAIL_SCREEN
+import com.example.android.architecture.blueprints.todoapp.util.AppMessageQueue
+import javax.inject.Inject
 
 /**
  * Screens used in [TodoDestinations]
@@ -61,22 +63,21 @@ object TodoDestinations {
  */
 class TodoNavigationActions(private val navController: NavHostController) {
 
-    fun navigateToTasks() {
+    fun navigateToTasks(userMessage: Int =0) {
+
+        val navigatesFromDrawer = userMessage == 0
+
         navController.navigate(
             TASKS_SCREEN
         ) {
             popUpTo(navController.graph.findStartDestination().id) {
-                inclusive = true
-                saveState = false
+                inclusive = !navigatesFromDrawer
+                saveState = navigatesFromDrawer
             }
             launchSingleTop = true
-            restoreState = false
+            restoreState = navigatesFromDrawer
         }
     }
-
-
-
-
 
         fun navigateToStatistics() {
         navController.navigate(TodoDestinations.STATISTICS_ROUTE) {

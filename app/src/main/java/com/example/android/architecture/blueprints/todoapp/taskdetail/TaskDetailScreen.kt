@@ -54,7 +54,7 @@ import com.example.android.architecture.blueprints.todoapp.util.TaskDetailTopApp
 fun TaskDetailScreen(
     onEditTask: (String) -> Unit,
     onBack: () -> Unit,
-    onDeleteTask: () -> Unit,
+    onDeleteTask: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TaskDetailViewModel = hiltViewModel(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
@@ -94,7 +94,7 @@ fun TaskDetailScreen(
         LaunchedEffect(uiState.isTaskDeleted) {
             if (uiState.isTaskDeleted) {
                 viewModel.setPendingMessage(DELETE_RESULT_OK)
-                onDeleteTask()
+                onDeleteTask(DELETE_RESULT_OK)
             }
         }
     }

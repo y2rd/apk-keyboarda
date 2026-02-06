@@ -35,10 +35,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,9 +61,11 @@ fun AppModalDrawer(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     content: @Composable () -> Unit
 ) {
+    val context = LocalContext.current
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
+
             AppDrawer(
                 currentRoute = currentRoute,
                 navigateToTasks = { navigationActions.navigateToTasks() },

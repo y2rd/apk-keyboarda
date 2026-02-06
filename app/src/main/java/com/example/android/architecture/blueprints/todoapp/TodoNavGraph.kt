@@ -89,7 +89,7 @@ fun TodoNavGraph(
                 topBarTitle = entry.arguments?.getInt(TITLE_ARG)!!,
                 taskId = taskId,
                 onTaskUpdate = {
-                    navActions.navigateToTasks()
+                    navActions.navigateToTasks(it)
                 },
                 onBack = { navController.popBackStack() }
             )
@@ -100,7 +100,7 @@ fun TodoNavGraph(
                     navActions.navigateToAddEditTask(R.string.edit_task, taskId)
                 },
                 onBack = { navController.popBackStack() },
-                onDeleteTask = { navActions.navigateToTasks() }
+                onDeleteTask = { navActions.navigateToTasks(it) }
             )
         }
     }

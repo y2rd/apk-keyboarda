@@ -13,4 +13,8 @@ class FakeAppMessageQueue : AppMessageQueue {
     override fun consume(): Int {
         return fakePrefs.remove("message") ?: 0
     }
+
+    override fun peek(): Int {
+        return fakePrefs.get("message") ?: 0
+    }
 }

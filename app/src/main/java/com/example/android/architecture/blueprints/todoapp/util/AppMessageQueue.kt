@@ -7,6 +7,7 @@ import androidx.core.content.edit
 interface AppMessageQueue {
     fun produce(message: Int)
     fun consume(): Int
+    fun peek(): Int
 }
 
 class AppMessageQueueImpl(private val prefs: SharedPreferences) : AppMessageQueue{
@@ -17,7 +18,7 @@ class AppMessageQueueImpl(private val prefs: SharedPreferences) : AppMessageQueu
     }
 
     override fun produce(message: Int) {
-        prefs.edit(commit = true){ putInt(MESSAGE_KEY, message) }
+        prefs.edit{ putInt(MESSAGE_KEY, message) }
     }
 
     override fun consume(): Int {
@@ -26,6 +27,10 @@ class AppMessageQueueImpl(private val prefs: SharedPreferences) : AppMessageQueu
             remove(MESSAGE_KEY)
         }
         return pendingMsg
+    }
+
+    override fun peek(): Int {
+        return prefs.getInt(MESSAGE_KEY, 0)
     }
 
 
