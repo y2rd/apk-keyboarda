@@ -7,7 +7,6 @@ import androidx.core.content.edit
 interface AppMessageQueue {
     fun produce(message: Int)
     fun consume(): Int
-    fun peek(): Int
 }
 
 class AppMessageQueueImpl(private val prefs: SharedPreferences) : AppMessageQueue{
@@ -29,9 +28,6 @@ class AppMessageQueueImpl(private val prefs: SharedPreferences) : AppMessageQueu
         return pendingMsg
     }
 
-    override fun peek(): Int {
-        return prefs.getInt(MESSAGE_KEY, 0)
-    }
 
 
 }
