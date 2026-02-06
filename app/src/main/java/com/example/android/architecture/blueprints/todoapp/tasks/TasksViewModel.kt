@@ -127,7 +127,6 @@ class TasksViewModel @Inject constructor(
     }
 
     fun showEditResultMessage() {
-        Log.d("showEditResult", "showEditResultMessage: ${taskRepository.readOncePendingMessage()}")
         when (taskRepository.readOncePendingMessage()) {
             EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_saved_task_message)
             ADD_EDIT_RESULT_OK -> showSnackbarMessage(R.string.successfully_added_task_message)

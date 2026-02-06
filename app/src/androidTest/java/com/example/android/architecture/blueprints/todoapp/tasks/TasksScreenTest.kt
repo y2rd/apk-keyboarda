@@ -166,8 +166,7 @@ class TasksScreenTest {
 
     @OptIn(ExperimentalTestApi::class)
     @Test
-    fun checkSnackbarOnlyDisplayOnce() = runTest {
-//        repository.createTask("TITLE1", "DESCRIPTION1")
+    fun snackBarOnlyDisplayOnce() = runTest {
 
         setContent()
         composeTestRule.waitForIdle()
