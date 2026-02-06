@@ -16,25 +16,65 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.IdlingResource
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.example.android.architecture.blueprints.todoapp.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.HiltTestActivity
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TodoDestinations
+import com.example.android.architecture.blueprints.todoapp.TodoNavGraph
+import com.example.android.architecture.blueprints.todoapp.TodoNavigationActions
 import com.example.android.architecture.blueprints.todoapp.TodoTheme
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskScreen
+import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel
 import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -63,9 +103,17 @@ class TasksScreenTest {
     @Inject
     lateinit var repository: TaskRepository
 
+    lateinit var todoNavActions: TodoNavigationActions
+
+    private lateinit var navController: NavHostController
+
+    val idlingResource = CountingIdlingResource("MyNetworkCalls")
+
+
     @Before
     fun init() {
         hiltRule.inject()
+        IdlingRegistry.getInstance().register(idlingResource)
     }
 
     @Test
@@ -113,6 +161,49 @@ class TasksScreenTest {
 
         openFilterAndSelectOption(R.string.nav_completed)
         composeTestRule.onNodeWithText("TITLE1").assertIsDisplayed()
+    }
+
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun checkSnackbarOnlyDisplayOnce() = runTest {
+//        repository.createTask("TITLE1", "DESCRIPTION1")
+
+        setContent()
+        composeTestRule.waitForIdle()
+
+        val newTaskBtn = composeTestRule.onNodeWithTag("New Task")
+        val snackBar = composeTestRule.onNodeWithText("Task saved")
+
+        newTaskBtn.assertIsDisplayed()
+            .assertIsEnabled()
+            .performClick()
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag("Title").performTextInput("TITLE1")
+        composeTestRule.onNodeWithTag("Enter your task here.").performTextInput("DESCRIPTION1")
+        composeTestRule
+            .onNodeWithContentDescription("Save task")
+            .performClick()
+
+        snackBar.isDisplayed()
+        composeTestRule.onNodeWithTag("New Task")
+            .assertIsDisplayed()
+            .isDisplayed()
+        composeTestRule.awaitIdle()
+
+        // Navigate to another page and come back to Task screen
+        // and assert that the snackbar is not displayed
+        newTaskBtn.assertIsDisplayed().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Back")
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.onAllNodesWithText("Todo")[0]
+            .assertIsDisplayed()
+        snackBar
+            .assertIsNotDisplayed()
     }
 
     @Test
@@ -255,26 +346,63 @@ class TasksScreenTest {
         composeTestRule.onNodeWithText("You have no active tasks!").assertIsDisplayed()
     }
 
+
+
     private fun setContent() {
+
+        navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+
+        todoNavActions = TodoNavigationActions(navController)
+
+
         composeTestRule.setContent {
-            TodoTheme {
-                Surface {
-                    TasksScreen(
-                        viewModel = TasksViewModel(repository, SavedStateHandle()),
-                        onUserMessageDisplayed = { },
-                        onAddTask = { },
-                        onTaskClick = { },
-                        openDrawer = { }
-                    )
-                }
+
+            composeTestRule.runOnUiThread {
+                navController.navigatorProvider.addNavigator(ComposeNavigator())
             }
+
+            TestNavHost(navController, repository = repository)
         }
+
     }
+
 
     private fun openFilterAndSelectOption(@StringRes option: Int) {
         composeTestRule.onNodeWithContentDescription(activity.getString(R.string.menu_filter))
             .performClick()
         composeTestRule.onNodeWithText(activity.getString(option)).assertIsDisplayed()
         composeTestRule.onNodeWithText(activity.getString(option)).performClick()
+    }
+
+
+    @After
+    fun tearDown(){
+        IdlingRegistry.getInstance().unregister(idlingResource)
+    }
+}
+
+
+@Composable
+fun TestNavHost(navController: NavHostController, repository: TaskRepository){
+    TodoTheme {
+        Surface {
+            TodoNavGraph(navController = navController)
+        }
+    }
+
+
+}
+
+
+class TaskTestViewModelFactory(private val repository: TaskRepository)
+    : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return TasksViewModel(repository, SavedStateHandle()) as T
+    }
+    }
+
+class AddEditTaskViewModelFactory(private val repository: TaskRepository): ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return AddEditTaskViewModel(repository, SavedStateHandle()) as T
     }
 }
