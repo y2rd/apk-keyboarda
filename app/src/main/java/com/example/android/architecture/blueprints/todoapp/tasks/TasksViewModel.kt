@@ -23,6 +23,7 @@ import com.example.android.architecture.blueprints.todoapp.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TodoDestinationsArgs.USER_MESSAGE_ARG
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
@@ -98,6 +99,14 @@ class TasksViewModel @Inject constructor(
             started = WhileUiSubscribed,
             initialValue = TasksUiState(isLoading = true)
         )
+
+    init {
+        // Read userMessageArgs from saveStateHandle
+        savedStateHandle.get<Int>(USER_MESSAGE_ARG)?.let { result ->
+            showEditResultMessage(result)
+            savedStateHandle[USER_MESSAGE_ARG] = 0
+        }
+    }
 
     fun setFiltering(requestType: TasksFilterType) {
         savedStateHandle[TASKS_FILTER_SAVED_STATE_KEY] = requestType
